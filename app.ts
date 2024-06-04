@@ -8,7 +8,8 @@ const app = express();
 app.use(express.json());
 
 app.get('/', (req, res) => {
-    res.send(req);
+    console.log({req});
+    res.send({ message: 'Hello, world!' });
 });
 
 app.post('/login', async (req, res) => {
