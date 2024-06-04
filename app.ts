@@ -1,6 +1,8 @@
 import express from 'express';
 import axios from 'axios';
 import dotenv from 'dotenv';
+import { insertUserInfo } from './libs/mysql';
+import { open } from 'fs';
 dotenv.config();
 
 const app = express();
@@ -12,24 +14,27 @@ app.get('/', (req, res) => {
     res.send({headers: req.headers});
 });
 
-app.post('/login', async (req, res) => {
-    const { code } = req.body;
-    const appId = process.env.APP_ID;  // 使用环境变量中的appId
-    const appSecret = process.env.APP_SECRET;  // 使用环境变量中的appSecret
-    const url = `https://api.weixin.qq.com/sns/jscode2session?appid=${appId}&secret=${appSecret}&js_code=${code}&grant_type=authorization_code`;
+app.post('/registerUser', async (req, res) => {
+    const {code} = req.body;
+    res.send({body: req.body, open_id: req.headers['x-wx-openid']});
+});
 
-    try {
-        const response = await axios.get(url);
-        const { openid, session_key } = response.data;
-        // 这里可以添加逻辑来处理 openid 和 session_key，如创建会话等
-        res.json({ openid, session_key });
-    } catch (error) {
-        console.error('登录失败:', error);
-        res.status(500).send('登录失败');
-    }
+app.get('/testInsert', async (req, res) => {
+    const insertRes = await insertUserInfo({
+        open_id: "test_open_id", // VARCHAR(255) UNIQUE,
+        avatarUrl: "test_avatarUrl", //  VARCHAR(255),
+        city: "test_city", // VARCHAR(255),
+        country: "test_country", // VARCHAR(255),
+        gender: 2, // INT,
+        language:  "test_language", // VARCHAR(255),
+        nickName: "test_nickName", // VARCHAR(255),
+    });
+    res.send({insertRes});
 });
 
 const PORT = process.env.PORT || 6010;
 app.listen(PORT, () => {
     console.log(`服务器运行在 http://localhost:${PORT}`);
 });
+
+
