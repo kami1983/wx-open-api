@@ -8,7 +8,7 @@ const app = express();
 app.use(express.json());
 
 app.get('/', (req, res) => {
-    res.send('Welcome to wx-login-server! <a href="https://github.com/kami1983/wx-open-api">查看源码</a>');
+    res.send(req);
 });
 
 app.post('/login', async (req, res) => {
