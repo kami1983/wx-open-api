@@ -15,8 +15,24 @@ app.get('/', (req, res) => {
 });
 
 app.post('/registerUser', async (req, res) => {
-    const {code} = req.body;
-    res.send({body: req.body, open_id: req.headers['x-wx-openid']});
+    const insertData = {
+        ...req.body,
+        open_id: req.headers['x-wx-openid'],
+    }
+    const insertRes = await insertUserInfo({
+        open_id: insertData.open_id, // VARCHAR(255) UNIQUE,
+        avatarUrl: insertData.avatarUrl, //  VARCHAR(255),
+        city: insertData.city, // VARCHAR(255),
+        country: insertData.country, // VARCHAR(255),
+        gender: insertData.gender, // INT,
+        language:  insertData.language, // VARCHAR(255),
+        nickName: insertData.nickName, // VARCHAR(255),
+    });
+    if (insertRes) {
+        res.send({status: true, backData: insertRes});
+    }else {
+        res.send({status: false, backData: insertRes});
+    }
 });
 
 app.get('/testInsert', async (req, res) => {
