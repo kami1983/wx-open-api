@@ -9,7 +9,7 @@ app.use(express.json());
 
 app.get('/', (req, res) => {
     console.log({headers: req.headers});
-    res.send({ message: 'Hello, world!' });
+    res.send({headers: req.headers});
 });
 
 app.post('/login', async (req, res) => {
