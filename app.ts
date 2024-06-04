@@ -8,7 +8,7 @@ const app = express();
 app.use(express.json());
 
 app.get('/', (req, res) => {
-    console.log({req});
+    console.log({headers: req.headers});
     res.send({ message: 'Hello, world!' });
 });
 
