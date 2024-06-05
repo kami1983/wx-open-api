@@ -40,11 +40,11 @@ const knex = require('knex')({
         database: process.env.DB_NAME,
         port: process.env.DB_PORT
     },
-    // pool: {
-    //     min: 0,
-    //     max: 7, // Adjust the maximum pool size as needed
-    //     acquireTimeoutMillis: 10000, // Set a timeout for acquiring connections
-    // }
+    pool: {
+        min: 0,
+        max: 7, // Adjust the maximum pool size as needed
+        acquireTimeoutMillis: 10000, // Set a timeout for acquiring connections
+    }
 });
 
 // 用 knex 插入 user_info 表数据，当 open_id 重复时，更新数据
@@ -62,8 +62,6 @@ export async function insertUserInfo(data: {
         return await knex('user_info').insert(data).onConflict('open_id').merge();
     } catch (error) {
         console.error('插入数据失败:', error);
-    } finally {
-        knex.destroy();
-    }
+    } 
     return null;
 }
