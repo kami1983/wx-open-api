@@ -69,7 +69,7 @@ app.post('/insertRentInfos', async (req, res) => {
         tags,
         image_urls
     }
-    console.log({insertData});
+    console.log('Insert data ', {insertData});
 
     const insertRes = await insertRentInfos(insertData);
     if (insertRes) {
