@@ -21,6 +21,7 @@
 
 // 获取 knex 数据对象
 
+import exp from 'constants';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -64,4 +65,67 @@ export async function insertUserInfo(data: {
         console.error('插入数据失败:', error);
     } 
     return null;
+}
+
+export async function insertRentInfos(params: {
+    open_id: string,
+    month_rent_price: number,
+    rent_type: string,
+    rent_area: number,
+    rent_address: string,
+    room_structure: string,
+    location_longitude: number,
+    location_latitude: number,
+    contact_information: string,
+    cash_discount: number,
+    additional_details: string,
+    tags: string,
+    image_urls: string[]
+}): Promise<object|null> {
+    try {
+        const {
+            open_id,
+            month_rent_price,
+            rent_type,
+            rent_area,
+            rent_address,
+            room_structure,
+            location_longitude,
+            location_latitude,
+            contact_information,
+            cash_discount,
+            additional_details,
+            tags,
+            image_urls // 假设这是一个图片 URL 数组
+        } = params;
+
+        // 插入租赁信息
+        const [rent_id] = await knex('rent_infos').insert({
+            open_id,
+            month_rent_price,
+            rent_type,
+            rent_area,
+            rent_address,
+            room_structure,
+            location_longitude,
+            location_latitude,
+            contact_information,
+            cash_discount,
+            additional_details,
+            tags
+        });
+
+        // 插入图片信息
+        if (image_urls && image_urls.length > 0) {
+            const imageRecords = image_urls.map(url => ({
+                rent_id,
+                image_url: url
+            }));
+            await knex('rent_images').insert(imageRecords);
+        }
+
+        return { rent_id };
+    } catch (error) {
+        return null;
+    }
 }

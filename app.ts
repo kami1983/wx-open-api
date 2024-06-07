@@ -1,7 +1,7 @@
 import express from 'express';
 import axios from 'axios';
 import dotenv from 'dotenv';
-import { insertUserInfo } from './libs/mysql';
+import { insertUserInfo, insertRentInfos } from './libs/mysql';
 import { open } from 'fs';
 dotenv.config();
 
@@ -33,6 +33,46 @@ app.post('/registerUser', async (req, res) => {
     }else {
         res.send({status: false, backData: insertRes});
     }
+});
+
+app.post('/insertRentInfos', async (req, res) => {
+    const {
+        open_id,
+        month_rent_price,
+        rent_type,
+        rent_area,
+        rent_address,
+        room_structure,
+        location_longitude,
+        location_latitude,
+        contact_information,
+        cash_discount,
+        additional_details,
+        tags,
+        image_urls // 假设这是一个图片 URL 数组
+    } = req.body;
+
+    const insertRes = await insertRentInfos({
+        open_id,
+        month_rent_price,
+        rent_type,
+        rent_area,
+        rent_address,
+        room_structure,
+        location_longitude,
+        location_latitude,
+        contact_information,
+        cash_discount,
+        additional_details,
+        tags,
+        image_urls
+    });
+    if (insertRes) {
+        res.send({status: true, backData: insertRes});
+    }else {
+        res.send({status: false, backData: insertRes});
+    }
+
 });
 
 app.get('/testInsert', async (req, res) => {
