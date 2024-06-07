@@ -36,6 +36,8 @@ app.post('/registerUser', async (req, res) => {
 });
 
 app.post('/insertRentInfos', async (req, res) => {
+
+    console.log('Raw body', req.body)
     const {
         open_id,
         month_rent_price,
