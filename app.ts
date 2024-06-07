@@ -52,7 +52,7 @@ app.post('/insertRentInfos', async (req, res) => {
         image_urls // 假设这是一个图片 URL 数组
     } = req.body;
 
-    const insertRes = await insertRentInfos({
+    const insertData = {
         open_id,
         month_rent_price,
         rent_type,
@@ -66,7 +66,10 @@ app.post('/insertRentInfos', async (req, res) => {
         additional_details,
         tags,
         image_urls
-    });
+    }
+    console.log({insertData});
+
+    const insertRes = await insertRentInfos(insertData);
     if (insertRes) {
         res.send({status: true, backData: insertRes});
     }else {
