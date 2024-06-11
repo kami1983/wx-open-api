@@ -104,7 +104,7 @@ app.post('/insertRentInfos', async (req, res) => {
     if (insertRes) {
         res.send({status: true, backData: insertRes});
     }else {
-        res.send({status: false, rawData: raw_data});
+        res.send({status: false, rawData: JSON.stringify(raw_data)});
     }
 
 });
@@ -139,6 +139,7 @@ app.get('/testInsertRentinfos', async (req, res) => {
     //     tags: [ '电梯房', '明厨明卫' ],
     //     image_urls: [ 'http://tmp/UWh1JoKjRBlKc02be25f8dc1bb6b068595db3b037890.png' ],
     // }
+
 
     const raw_data = {
         image_urls: [ 'http://tmp/EKmKo4Vsbv3ic02be25f8dc1bb6b068595db3b037890.png' ],
