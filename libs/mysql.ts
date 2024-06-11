@@ -67,7 +67,7 @@ export async function insertUserInfo(data: {
     return null;
 }
 
-export async function insertRentInfos(params: {
+export type TypeInsertRentInfos = {
     open_id: string,
     month_rent_price: number,
     rent_type: string,
@@ -81,7 +81,9 @@ export async function insertRentInfos(params: {
     additional_details: string,
     tags: string,
     image_urls: string[]
-}): Promise<object|null> {
+}
+
+export async function insertRentInfos(params: TypeInsertRentInfos): Promise<object|null> {
     try {
         const {
             open_id,
