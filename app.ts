@@ -104,7 +104,7 @@ app.post('/insertRentInfos', async (req, res) => {
     if (insertRes) {
         res.send({status: true, backData: insertRes});
     }else {
-        res.send({status: false, backData: insertRes});
+        res.send({status: false, rawData: raw_data});
     }
 
 });
