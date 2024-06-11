@@ -128,6 +128,7 @@ export async function insertRentInfos(params: TypeInsertRentInfos): Promise<obje
 
         return { rent_id };
     } catch (error) {
+        console.error('插入数据失败:', error);
         return null;
     }
 }

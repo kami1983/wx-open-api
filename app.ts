@@ -140,22 +140,38 @@ app.get('/testInsertRentinfos', async (req, res) => {
     //     image_urls: [ 'http://tmp/UWh1JoKjRBlKc02be25f8dc1bb6b068595db3b037890.png' ],
     // }
 
-
     const raw_data = {
-        image_urls: [ 'http://tmp/EKmKo4Vsbv3ic02be25f8dc1bb6b068595db3b037890.png' ],
-        tags: [ '非中介', '电梯房' ],
-        additional_details: '',
-        cash_discount: '',
-        contact_information: '18210008157',
-        location_latitude: 23.097056049821507,
-        location_longitude: 113.32077285011394,
-        room_structure: [ 1, 2, 0 ],
-        rent_address: 'lizhuang',
-        rent_area: '98',
-        rent_type: '合租',
-        month_rent_price: '3100',
-        open_id: 'test_open_id',
+        "open_id":"xxxxxxxxxxx",
+        "month_rent_price":"3100",
+        "rent_type":"合租",
+        "rent_area":"98",
+        "rent_address":"北京",
+        "room_structure":[0,2,0]
+        ,"location_longitude":113.32452,
+        "location_latitude":23.099994,
+        "contact_information":"18210008157",
+        "cash_discount":"",
+        "additional_details":"",
+        "tags":["明厨明卫","带家电"],
+        "image_urls":["http://tmp/WA8kpNfpWFNTbcb0a020db0e35d949a5c2c5f53f59e6.png"]
     }
+
+
+    // const raw_data = {
+    //     image_urls: [ 'http://tmp/EKmKo4Vsbv3ic02be25f8dc1bb6b068595db3b037890.png' ],
+    //     tags: [ '非中介', '电梯房' ],
+    //     additional_details: '',
+    //     cash_discount: '',
+    //     contact_information: '18210008157',
+    //     location_latitude: 23.097056049821507,
+    //     location_longitude: 113.32077285011394,
+    //     room_structure: [ 1, 2, 0 ],
+    //     rent_address: 'lizhuang',
+    //     rent_area: '98',
+    //     rent_type: '合租',
+    //     month_rent_price: '3100',
+    //     open_id: 'test_open_id',
+    // }
 
     // const formatRawData = () => {
     //    return {
@@ -177,28 +193,22 @@ app.get('/testInsertRentinfos', async (req, res) => {
 });
 
 function formatRawData(raw_data: any): TypeInsertRentInfos {
-//     return {
-//         ...raw_data,
-//         tags: raw_data.tags.join(',') as string,
-//         cash_discount: Number(raw_data.cash_discount ?? '0'),
-//         room_structure: raw_data.room_structure.join(',') as string,
-//         rent_area: Number(raw_data.rent_area),
-//         month_rent_price: Number(raw_data.month_rent_price),
-//         location_latitude: raw_data.location_latitude,
-//         location_longitude: raw_data.location_longitude,
-//         open_id: 'test_open_id',
-//    }
+
+    const convertToFloat = (value: any) => {
+        return isNaN(parseFloat(value??'0'))?0:parseFloat(value??'0');
+    }
+
    return {
-        open_id: 'test_open_id',
-        month_rent_price: parseFloat(raw_data.month_rent_price),
+        open_id: raw_data.open_id??'',
+        month_rent_price: convertToFloat(raw_data.month_rent_price),
         rent_type: raw_data.rent_type??'',
-        rent_area: parseFloat(raw_data.number) ,
+        rent_area: convertToFloat(raw_data.rent_area) ,
         rent_address: raw_data.rent_address??'',
-        room_structure: raw_data.room_structure??[].join(',').toString(),
-        location_longitude: parseFloat(raw_data.location_longitude),
-        location_latitude: parseFloat(raw_data.location_latitude),
+        room_structure: (raw_data.room_structure??[]).join(',').toString(),
+        location_longitude: convertToFloat(raw_data.location_longitude),
+        location_latitude: convertToFloat(raw_data.location_latitude),
         contact_information: raw_data.contact_information,
-        cash_discount: parseFloat(raw_data.cash_discount),
+        cash_discount: convertToFloat(raw_data.cash_discount),
         additional_details: raw_data.additional_details??'',
         tags: (raw_data.tags??[]).join(',').toString(),
         image_urls: raw_data.image_urls??[],
