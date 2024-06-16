@@ -1,7 +1,7 @@
 import express from 'express';
 import axios from 'axios';
 import dotenv from 'dotenv';
-import { insertUserInfo, insertRentInfos, TypeInsertRentInfos } from './libs/mysql';
+import { insertUserInfo, insertRentInfos, TypeInsertRentInfos, fetchRentInfos, fetchRentInfosByOpenIdPaged } from './libs/mysql';
 import { open } from 'fs';
 dotenv.config();
 
@@ -53,24 +53,6 @@ app.post('/insertRentInfos', async (req, res) => {
         image_urls // 假设这是一个图片 URL 数组
     } = req.body;
 
-    // const insertData = {
-    //     open_id: req.headers['x-wx-openid'],
-    //     month_rent_price,
-    //     rent_type,
-    //     rent_area,
-    //     rent_address,
-    //     room_structure,
-    //     location_longitude,
-    //     location_latitude,
-    //     contact_information,
-    //     cash_discount,
-    //     additional_details,
-    //     tags,
-    //     image_urls
-    // }
-    // console.log('Insert data ', {insertData});
-
-
     const raw_data = {
         open_id: req.headers['x-wx-openid'],
         month_rent_price,
@@ -87,27 +69,27 @@ app.post('/insertRentInfos', async (req, res) => {
         image_urls,
     }
 
-    // const formatRawData = () => {
-    //     return {
-    //          ...raw_data,
-    //          tags: raw_data.tags.join(','),
-    //          cash_discount: Number(raw_data.cash_discount ?? '0'),
-    //          room_structure: raw_data.room_structure.join(','),
-    //          rent_area: Number(raw_data.rent_area),
-    //          month_rent_price: Number(raw_data.month_rent_price),
-    //          open_id: 'test_open_id',
-    //          image_urls:[]
-    //     }
-    //  }
-
     const insertRes = await insertRentInfos(formatRawData(raw_data));
     if (insertRes) {
         res.send({status: true, backData: insertRes});
     }else {
-        res.send({status: false, rawData: JSON.stringify(raw_data)});
+        res.send({status: false, backData: JSON.stringify(raw_data)});
     }
 
 });
+
+app.get('/user/rent-infos', async (req, res) => {
+    const { page = '1', limit = '10' } = req.query; // 从请求中获取分页参数
+    const open_id = req.headers['x-wx-openid'] as string ??''
+    // const open_id = 'o4IK35VLNtV7Cd_t0fiZKP67tOPU'
+    const result = await fetchRentInfosByOpenIdPaged(open_id, parseInt(page as string), parseInt(limit as string));
+    if (result) {
+        res.send({status: true, backData: result});
+    } else {
+        res.send({status: false, backData: JSON.stringify(req.query)});
+    }
+});
+
 
 app.get('/testInsertUser', async (req, res) => {
     const insertRes = await insertUserInfo({
