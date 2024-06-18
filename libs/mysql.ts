@@ -220,3 +220,33 @@ export async function fetchRentInfosByOpenIdPaged(open_id: string, page = 1, lim
         return [];
     }
 }
+
+/**
+ * Refreshes the rent info entry by updating the updated_at timestamp to the current time.
+ * @param {string} open_id - The user's OpenID associated with the rent info.
+ * @param {number} rentid - The ID of the rent info entry to update.
+ * @returns {Promise<object|null>} - Returns the updated record, or null if the update fails.
+ */
+export async function refreshRentInfosByOpenId(open_id: string, rentid: number) {
+    try {
+        console.log({ open_id, rentid})
+        // 更新记录，并获取更新后的记录返回
+        const updatedRows = await knex('rent_infos')
+            .where({ id: rentid, open_id: open_id })
+            .update({ updated_at: knex.fn.now() })
+            .then(() => 
+                knex('rent_infos')
+                .where({ id: rentid })
+                .select()
+            );
+        console.log({updatedRows})
+        if (updatedRows.length > 0) {
+            return updatedRows[0];  // 返回更新后的记录
+        } else {
+            return null; // 未找到记录或没有更新
+        }
+    } catch (error) {
+        console.error('更新失败:', error);
+        return null;
+    }
+}

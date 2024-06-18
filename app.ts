@@ -1,7 +1,7 @@
 import express from 'express';
 import axios from 'axios';
 import dotenv from 'dotenv';
-import { insertUserInfo, insertRentInfos, TypeInsertRentInfos, fetchRentInfos, fetchRentInfosByOpenIdPaged } from './libs/mysql';
+import { insertUserInfo, insertRentInfos, TypeInsertRentInfos, fetchRentInfos, fetchRentInfosByOpenIdPaged, refreshRentInfosByOpenId } from './libs/mysql';
 import { open } from 'fs';
 dotenv.config();
 
@@ -90,6 +90,28 @@ app.get('/user/rent-infos', async (req, res) => {
     }
 });
 
+app.get('/user/refersh-rent', async (req, res) => {
+    const { rentid = '0' } = req.query; // 从请求中获取分页参数
+    const open_id = req.headers['x-wx-openid'] as string ??''
+    // const open_id = 'o4IK35VLNtV7Cd_t0fiZKP67tOPU'
+    const result = await refreshRentInfosByOpenId(open_id, parseInt(rentid as string));
+    if (result) {
+        res.send({status: true, backData: result});
+    } else {
+        res.send({status: false, backData: JSON.stringify(req.query)});
+    }
+});
+
+
+app.get('/testRefreshRentInfosByOpenId', async (req, res) => {
+    const { rentid = '0' } = req.query; // 从请求中获取分页参数
+    const result = await refreshRentInfosByOpenId('o4IK35VLNtV7Cd_t0fiZKP67tOPU', parseInt(rentid as string));
+    if (result) {
+        res.send({status: true, backData: result});
+    } else {
+        res.send({status: false, backData: JSON.stringify(req.query)});
+    }
+});
 
 app.get('/testInsertUser', async (req, res) => {
     const insertRes = await insertUserInfo({
@@ -105,22 +127,6 @@ app.get('/testInsertUser', async (req, res) => {
 });
 
 app.get('/testInsertRentinfos', async (req, res) => {
-
-    // const raw_data = {
-    //     open_id: undefined,
-    //     month_rent_price: '3100',
-    //     rent_type: '合租',
-    //     rent_area: '91',
-    //     rent_address: 'Beijing tongzhou1',
-    //     room_structure: [ 1, 2, 0 ],
-    //     location_longitude: 113.32452,
-    //     location_latitude: 23.099994,
-    //     contact_information: '',
-    //     cash_discount: '',
-    //     additional_details: '',
-    //     tags: [ '电梯房', '明厨明卫' ],
-    //     image_urls: [ 'http://tmp/UWh1JoKjRBlKc02be25f8dc1bb6b068595db3b037890.png' ],
-    // }
 
     const raw_data = {
         "open_id":"xxxxxxxxxxx",
