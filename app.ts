@@ -1,7 +1,7 @@
 import express from 'express';
 import axios from 'axios';
 import dotenv from 'dotenv';
-import { insertUserInfo, insertRentInfos, TypeInsertRentInfos, fetchRentInfos, fetchRentInfosByOpenIdPaged, refreshRentInfosByOpenId } from './libs/mysql';
+import { insertUserInfo, insertRentInfos, TypeInsertRentInfos, deleteRentInfosByOpenId, fetchRentInfosByOpenIdPaged, refreshRentInfosByOpenId } from './libs/mysql';
 import { open } from 'fs';
 dotenv.config();
 
@@ -102,6 +102,27 @@ app.get('/user/refresh-rent', async (req, res) => {
     }
 });
 
+app.get('/user/delete-rent', async (req, res) => {
+    const { rentid = '0' } = req.query; // 从请求中获取分页参数
+    const open_id = req.headers['x-wx-openid'] as string ??''
+    // const open_id = 'o4IK35VLNtV7Cd_t0fiZKP67tOPU'
+    const result = await deleteRentInfosByOpenId(open_id, parseInt(rentid as string));
+    if (result) {
+        res.send({status: true, backData: result});
+    } else {
+        res.send({status: false, backData: JSON.stringify(req.query)});
+    }
+});
+
+app.get('/testDeleteRentInfosByOpenId', async (req, res) => {
+    const { rentid = '0' } = req.query; // 从请求中获取分页参数
+    const result = await deleteRentInfosByOpenId('o4IK35VLNtV7Cd_t0fiZKP67tOPU', parseInt(rentid as string));
+    if (result) {
+        res.send({status: true, backData: result});
+    } else {
+        res.send({status: false, backData: JSON.stringify(req.query)});
+    }
+});
 
 app.get('/testRefreshRentInfosByOpenId', async (req, res) => {
     const { rentid = '0' } = req.query; // 从请求中获取分页参数

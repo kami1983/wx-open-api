@@ -250,3 +250,27 @@ export async function refreshRentInfosByOpenId(open_id: string, rentid: number) 
         return null;
     }
 }
+
+
+/**
+ * Deletes a rental info record by ID, ensuring it belongs to the specified open_id.
+ * @param {string} open_id - The user's unique identifier.
+ * @param {number} rentid - The ID of the rent info to be deleted.
+ * @returns {Promise<object|null>} - The result of the deletion operation.
+ */
+export async function deleteRentInfosByOpenId(open_id: string, rentid: number) {
+    try {
+        const deletedRows = await knex('rent_infos')
+            .where({ id: rentid, open_id: open_id }) // Ensuring the rent belongs to the user
+            .del(); // Deletes the record
+
+        if (deletedRows) {
+            return { deletedRows, rentid, open_id };
+        } else {
+            return null; // No records deleted
+        }
+    } catch (error) {
+        console.error('Error deleting rental info:', error);
+        return null; // Return null on error
+    }
+}
