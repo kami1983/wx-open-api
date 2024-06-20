@@ -79,6 +79,8 @@ export type TypeInsertRentInfos = {
     contact_information: string,
     cash_discount: number,
     additional_details: string,
+    type: number,
+    status: number,
     tags: string,
     image_urls: string[]
 }
@@ -97,6 +99,8 @@ export async function insertRentInfos(params: TypeInsertRentInfos): Promise<obje
             contact_information,
             cash_discount,
             additional_details,
+            type,
+            status,
             tags,
             image_urls // 假设这是一个图片 URL 数组
         } = params;
@@ -114,6 +118,8 @@ export async function insertRentInfos(params: TypeInsertRentInfos): Promise<obje
             contact_information,
             cash_discount,
             additional_details,
+            type,
+            status,
             tags
         });
 

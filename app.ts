@@ -49,6 +49,8 @@ app.post('/insertRentInfos', async (req, res) => {
         contact_information,
         cash_discount,
         additional_details,
+        type,
+        status,
         tags,
         image_urls // 假设这是一个图片 URL 数组
     } = req.body;
@@ -65,6 +67,8 @@ app.post('/insertRentInfos', async (req, res) => {
         contact_information,
         cash_discount,
         additional_details,
+        type,
+        status,
         tags,
         image_urls,
     }
@@ -181,41 +185,10 @@ app.get('/testInsertRentinfos', async (req, res) => {
         "cash_discount":"",
         "additional_details":"",
         "tags":["明厨明卫","带家电"],
+        "status": 99,
+        "type": 99,
         "image_urls":["http://tmp/WA8kpNfpWFNTbcb0a020db0e35d949a5c2c5f53f59e6.png"]
     }
-
-
-    // const raw_data = {
-    //     image_urls: [ 'http://tmp/EKmKo4Vsbv3ic02be25f8dc1bb6b068595db3b037890.png' ],
-    //     tags: [ '非中介', '电梯房' ],
-    //     additional_details: '',
-    //     cash_discount: '',
-    //     contact_information: '18210008157',
-    //     location_latitude: 23.097056049821507,
-    //     location_longitude: 113.32077285011394,
-    //     room_structure: [ 1, 2, 0 ],
-    //     rent_address: 'lizhuang',
-    //     rent_area: '98',
-    //     rent_type: '合租',
-    //     month_rent_price: '3100',
-    //     open_id: 'test_open_id',
-    // }
-
-    // const formatRawData = () => {
-    //    return {
-    //         ...raw_data,
-    //         tags: raw_data.tags.join(',') as string,
-    //         cash_discount: Number(raw_data.cash_discount ?? '0'),
-    //         room_structure: raw_data.room_structure.join(',') as string,
-    //         rent_area: Number(raw_data.rent_area),
-    //         month_rent_price: Number(raw_data.month_rent_price),
-    //         location_latitude: raw_data.location_latitude,
-    //         location_longitude: raw_data.location_longitude,
-    //         open_id: 'test_open_id',
-      
-    //    }
-    // }
-
     const insertRes = await insertRentInfos(formatRawData(raw_data));
     res.send({insertRes});
 });
@@ -239,6 +212,8 @@ function formatRawData(raw_data: any): TypeInsertRentInfos {
         cash_discount: convertToFloat(raw_data.cash_discount),
         additional_details: raw_data.additional_details??'',
         tags: (raw_data.tags??[]).join(',').toString(),
+        status: parseInt(raw_data.status??"0"),
+        type: parseInt(raw_data.type??"0"),
         image_urls: raw_data.image_urls??[],
     }
 }
