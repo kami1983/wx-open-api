@@ -274,3 +274,23 @@ export async function deleteRentInfosByOpenId(open_id: string, rentid: number) {
         return null; // Return null on error
     }
 }
+
+
+/**
+ * Fetches all images for a given rent ID from the rent_images table.
+ * @param {number} rentId - The unique identifier for the rental entry.
+ * @returns {Promise<Array|null>} - A promise that resolves to an array of image records or null if an error occurs.
+ */
+export async function getRentImagesByRentid(rentId: number) {
+    try {
+        console.log('Fetching images for rentId:', rentId);
+        // Fetch all images linked to the given rent ID
+        const images = await knex('rent_images')
+            .select('id', 'image_url', 'created_at', 'updated_at')
+            .where({ rent_id: rentId });
+        return images;
+    } catch (error) {
+        console.error('Failed to fetch images:', error);
+        return null; // Handle the error appropriately, returning null or throwing an error
+    }
+}

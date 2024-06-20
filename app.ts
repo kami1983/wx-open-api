@@ -1,7 +1,7 @@
 import express from 'express';
 import axios from 'axios';
 import dotenv from 'dotenv';
-import { insertUserInfo, insertRentInfos, TypeInsertRentInfos, deleteRentInfosByOpenId, fetchRentInfosByOpenIdPaged, refreshRentInfosByOpenId } from './libs/mysql';
+import { insertUserInfo, insertRentInfos, TypeInsertRentInfos, deleteRentInfosByOpenId, fetchRentInfosByOpenIdPaged, refreshRentInfosByOpenId, getRentImagesByRentid } from './libs/mysql';
 import { open } from 'fs';
 dotenv.config();
 
@@ -111,6 +111,25 @@ app.get('/user/delete-rent', async (req, res) => {
         res.send({status: true, backData: result});
     } else {
         res.send({status: false, backData: JSON.stringify(req.query)});
+    }
+});
+
+app.get('/user/rent-images', async (req, res) => {
+    try {
+     const { rentid = '0' } = req.query; // 从请求中获取分页参数
+        const rentId = parseInt(rentid as string);
+        if (isNaN(rentId) || rentId <= 0) {
+            return res.status(400).json({ error: 'Invalid rent ID provided' });
+        }
+        
+        const images = await getRentImagesByRentid(rentId);
+        if (images) {
+            res.send({status: true, backData: images});
+        } else {
+            res.send({status: false, backData: JSON.stringify(req.query)});
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Server error' });
     }
 });
 
