@@ -54,6 +54,7 @@ CREATE TABLE `rent_infos` (
   `tags` varchar(255) DEFAULT NULL,
   `type` int(2) DEFAULT '0',
   `status` int(2) DEFAULT '0',
+  `cover_image` varchar(255) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -64,4 +65,4 @@ CREATE TABLE `rent_infos` (
   KEY `idx_open_id` (`open_id`),
   KEY `idx_type` (`type`),
   KEY `idx_status` (`status`)
-) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;

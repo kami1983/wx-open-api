@@ -118,6 +118,7 @@ export async function insertRentInfos(params: TypeInsertRentInfos): Promise<obje
             contact_information,
             cash_discount,
             additional_details,
+            cover_image: image_urls[0] ?? '',
             type,
             status,
             tags
