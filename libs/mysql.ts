@@ -166,6 +166,7 @@ export async function fetchRentInfos(page = 1, limit = 10) {
                     'contact_information',
                     'cash_discount',
                     'additional_details',
+                    'cover_image',
                     'tags',
                     'created_at',
                     'updated_at'
