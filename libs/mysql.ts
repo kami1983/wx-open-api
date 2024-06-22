@@ -147,46 +147,77 @@ export async function insertRentInfos(params: TypeInsertRentInfos): Promise<obje
  * @returns {Promise<object>} 包含当前页数据和总记录数的对象
  */
 export async function fetchRentInfos(page = 1, limit = 10) {
-    const offset = (page - 1) * limit; // 计算当前页起始记录的偏移量
+
+    const offset = (page - 1) * limit; // 计算分页的起始点
 
     try {
-        // 同时获取页面数据和总记录数
-        const [data, [{ total }]] = await Promise.all([
-            knex('rent_infos')
-                .select(
-                    'id',
-                    'open_id',
-                    'month_rent_price',
-                    'rent_type',
-                    'rent_area',
-                    'rent_address',
-                    'room_structure',
-                    'location_longitude',
-                    'location_latitude',
-                    'contact_information',
-                    'cash_discount',
-                    'additional_details',
-                    'cover_image',
-                    'tags',
-                    'created_at',
-                    'updated_at'
-                )
-                .offset(offset)
-                .limit(limit),
-            knex('rent_infos').count({ total: 'id' }) // 计算总记录数
-        ]);
+        const results = await knex('rent_infos')
+            .select(
+                'id',
+                'month_rent_price',
+                'rent_type',
+                'rent_area',
+                'rent_address',
+                'room_structure',
+                'location_longitude',
+                'location_latitude',
+                'contact_information',
+                'cash_discount',
+                'additional_details',
+                'cover_image',
+                'tags',
+                'created_at',
+                'updated_at'
+            ).orderBy('updated_at', 'desc')
+            .offset(offset)
+            .limit(limit);
 
-        return {
-            data,
-            total,
-            currentPage: page,
-            totalPages: Math.ceil(total / limit),
-            limit
-        };
+        return results;
     } catch (error) {
-        console.error('获取租赁信息失败:', error);
-        return null;
+        console.error('分页查询租赁信息失败:', error);
+        return [];
     }
+
+    // const offset = (page - 1) * limit; // 计算当前页起始记录的偏移量
+
+    // try {
+    //     // 同时获取页面数据和总记录数
+    //     const [data, [{ total }]] = await Promise.all([
+    //         knex('rent_infos')
+    //             .select(
+    //                 'id',
+    //                 'open_id',
+    //                 'month_rent_price',
+    //                 'rent_type',
+    //                 'rent_area',
+    //                 'rent_address',
+    //                 'room_structure',
+    //                 'location_longitude',
+    //                 'location_latitude',
+    //                 'contact_information',
+    //                 'cash_discount',
+    //                 'additional_details',
+    //                 'cover_image',
+    //                 'tags',
+    //                 'created_at',
+    //                 'updated_at'
+    //             )
+    //             .offset(offset)
+    //             .limit(limit),
+    //         knex('rent_infos').count({ total: 'id' }) // 计算总记录数
+    //     ]);
+
+    //     return {
+    //         data,
+    //         total,
+    //         currentPage: page,
+    //         totalPages: Math.ceil(total / limit),
+    //         limit
+    //     };
+    // } catch (error) {
+    //     console.error('获取租赁信息失败:', error);
+    //     return null;
+    // }
 }
 
 /**
