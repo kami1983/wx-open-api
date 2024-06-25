@@ -36,7 +36,6 @@ app.post('/registerUser', async (req, res) => {
 });
 
 app.post('/insertRentInfos', async (req, res) => {
-
     console.log('Raw body', req.body)
     const {
         month_rent_price,
@@ -83,10 +82,15 @@ app.post('/insertRentInfos', async (req, res) => {
 });
 
 app.get('/user/rent-infos', async (req, res) => {
-    const { page = '1', limit = '10' } = req.query; // 从请求中获取分页参数
+    const { page = '1', limit = '10', type = '1'} = req.query; // 从请求中获取分页参数
     const open_id = req.headers['x-wx-openid'] as string ??''
     // const open_id = 'o4IK35VLNtV7Cd_t0fiZKP67tOPU'
-    const result = await fetchRentInfosByOpenIdPaged(open_id, parseInt(page as string), parseInt(limit as string));
+    const result = await fetchRentInfosByOpenIdPaged(
+        open_id, 
+        parseInt(page as string), 
+        parseInt(limit as string),
+        parseInt(type as string),
+    );
     if (result) {
         res.send({status: true, backData: result});
     } else {
@@ -95,8 +99,13 @@ app.get('/user/rent-infos', async (req, res) => {
 });
 
 app.get('/rent-infos', async (req, res) => {
-    const { page = '1', limit = '10' } = req.query; // 从请求中获取分页参数
-    const result = await fetchRentInfos(parseInt(page as string), parseInt(limit as string));
+    const { page = '1', limit = '10', type = '1', status = '1' } = req.query; // 从请求中获取分页参数
+    const result = await fetchRentInfos(
+        parseInt(page as string), 
+        parseInt(limit as string),
+        parseInt(type as string),
+        parseInt(status as string),
+    );
     if (result) {
         res.send({status: true, backData: result});
     } else {

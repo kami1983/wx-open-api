@@ -146,7 +146,7 @@ export async function insertRentInfos(params: TypeInsertRentInfos): Promise<obje
  * @param {number} limit - 每页显示的记录数
  * @returns {Promise<object>} 包含当前页数据和总记录数的对象
  */
-export async function fetchRentInfos(page = 1, limit = 10) {
+export async function fetchRentInfos(page = 1, limit = 10, type = 1, status = 1) {
 
     const offset = (page - 1) * limit; // 计算分页的起始点
 
@@ -168,7 +168,8 @@ export async function fetchRentInfos(page = 1, limit = 10) {
                 'tags',
                 'created_at',
                 'updated_at'
-            ).orderBy('updated_at', 'desc')
+            ).where({ type, status })
+            .orderBy('updated_at', 'desc')
             .offset(offset)
             .limit(limit);
 
@@ -218,7 +219,7 @@ export async function fetchRentDetail(rentid: number) {
  * @param {number} limit - 每页显示的记录数
  * @returns {Promise<Array>} 返回分页的租赁信息数组
  */
-export async function fetchRentInfosByOpenIdPaged(open_id: string, page = 1, limit = 10) {
+export async function fetchRentInfosByOpenIdPaged(open_id: string, page = 1, limit = 10, type = 1) {
     const offset = (page - 1) * limit; // 计算分页的起始点
 
     try {
@@ -240,7 +241,7 @@ export async function fetchRentInfosByOpenIdPaged(open_id: string, page = 1, lim
                 'created_at',
                 'updated_at'
             )
-            .where({ open_id })
+            .where({ open_id, type })
             .orderBy('updated_at', 'desc')
             .offset(offset)
             .limit(limit);
