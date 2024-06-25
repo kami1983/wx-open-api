@@ -53,7 +53,7 @@ app.post('/insertRentInfos', async (req, res) => {
         tags,
         image_urls // 假设这是一个图片 URL 数组
     } = req.body;
-
+ 
     const raw_data = {
         open_id: req.headers['x-wx-openid'],
         month_rent_price,
