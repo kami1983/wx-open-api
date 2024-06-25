@@ -325,3 +325,73 @@ export async function getRentImagesByRentid(rentId: number) {
         return null; // Handle the error appropriately, returning null or throwing an error
     }
 }
+
+/**
+ * Fetches a paged list of favorites for a given user.
+ * @param {string} open_id - The user's OpenID.
+ * @param {number} page - The page number to retrieve.
+ * @param {number} limit - The number of items per page.
+ * @returns {Promise<Array>} - A list of favorite entries.
+ */
+export async function fetchFavoritesByOpenId(open_id: string, page = 1, limit = 10) {
+    const offset = (page - 1) * limit; // Calculate the offset for the page
+
+    try {
+        const favorites = await knex('favorites')
+            .where({'favorites.open_id': open_id, 'favorites.status': 1}) // Use the table name in the where clause to remove ambiguity
+            .join('rent_infos', 'favorites.rent_id', '=', 'rent_infos.id')
+            .select('favorites.id', 'rent_infos.*')
+            .orderBy('favorites.created_at', 'desc')
+            .limit(limit)
+            .offset(offset);
+
+        return favorites;
+    } catch (error) {
+        console.error('Error fetching favorites:', error);
+        return [];
+    }
+}
+
+
+/**
+ * Deletes a favorite entry for a given user and rent_id.
+ * @param {string} open_id - The user's OpenID.
+ * @param {number} rent_id - The ID of the rent info to be un-favorited.
+ * @returns {Promise<boolean>} - True if the deletion was successful, false otherwise.
+ */
+export async function deleteFavorite(open_id: string, rent_id: number) {
+    try {
+        const deletedRows = await knex('favorites')
+            .where({ open_id, rent_id })
+            .del();
+
+        return deletedRows > 0;
+    } catch (error) {
+        console.error('Error deleting favorite:', error);
+        return false;
+    }
+}
+
+/**
+ * Adds a new favorite to the favorites table.
+ * @param {string} open_id - The open ID of the user.
+ * @param {number} rent_id - The rent ID that the user wants to favorite.
+ * @param {number} type - The type of the favorite.
+ * @param {number} status - The status of the favorite.
+ * @returns {Promise<object|null>} - The result of the insert operation.
+ */
+export async function insertFavorite(open_id: string, rent_id: number, type: number, status: number, title: string) {
+    try {
+        const [id] = await knex('favorites').insert({
+            open_id,
+            rent_id,
+            title,
+            type,
+            status
+        }).onConflict(['open_id', 'rent_id']).ignore();
+        return id ? { id, open_id, rent_id, type, status } : null; // Return the inserted data or null if ignored
+    } catch (error) {
+        console.error('Error inserting favorite:', error);
+        return null;
+    }
+}

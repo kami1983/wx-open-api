@@ -1,7 +1,7 @@
 import express from 'express';
 import axios from 'axios';
 import dotenv from 'dotenv';
-import { insertUserInfo, insertRentInfos, TypeInsertRentInfos, deleteRentInfosByOpenId, fetchRentInfosByOpenIdPaged, refreshRentInfosByOpenId, getRentImagesByRentid, fetchRentInfos, fetchRentDetail } from './libs/mysql';
+import { insertUserInfo, insertRentInfos, TypeInsertRentInfos, deleteRentInfosByOpenId, fetchRentInfosByOpenIdPaged, refreshRentInfosByOpenId, getRentImagesByRentid, fetchRentInfos, fetchRentDetail, fetchFavoritesByOpenId, deleteFavorite, insertFavorite } from './libs/mysql';
 import { open } from 'fs';
 dotenv.config();
 
@@ -238,6 +238,77 @@ function formatRawData(raw_data: any): TypeInsertRentInfos {
     }
 }
 
+app.get('/user/favorites/list', async (req, res) => {
+    const { page = '1', limit = '10' } = req.query; // retrieve pagination parameters from query
+    const open_id = req.headers['x-wx-openid'] as string ??''
+    if (!open_id) {
+        return res.status(400).json({ status: false, error: 'Missing open_id' });
+    }
+
+    console.log('open_id', open_id, parseInt(page as string), parseInt(limit as string));
+    try {
+        const favorites = await fetchFavoritesByOpenId(open_id, parseInt(page as string), parseInt(limit as string));
+        res.json({ status: true, data: favorites });
+    } catch (error) {
+        console.error('Error fetching favorites:', error);
+        res.status(500).json({ status: false, error: 'Internal server error' });
+    }
+});
+
+app.get('/user/favorite/del', async (req, res) => {
+    const { rentid } = req.query; // assuming rent_id is sent in the request body
+    const open_id = req.headers['x-wx-openid'] as string ??''
+
+    if (!open_id || !rentid) {
+        return res.status(400).json({ status: false, error: 'Missing open_id or rentid' });
+    }
+
+    try {
+        const success = await deleteFavorite(open_id, parseInt(rentid as string));
+        if (success) {
+            res.json({ status: true, message: 'Favorite deleted successfully' });
+        } else {
+            res.status(404).json({ status: false, message: 'Favorite not found or already deleted' });
+        }
+    } catch (error) {
+        console.error('Error deleting favorite:', error);
+        res.status(500).json({ status: false, error: 'Internal server error' });
+    }
+});
+
+/**
+curl -X POST http://localhost:6010/user/favorite/add \
+-H "Content-Type: application/json" \
+-H "x-wx-openid: o4IK35VLNtV7Cd_t0fiZKP67tOPU" \
+-d '{
+    "rentid": "60",
+    "type": "1",
+    "status": "1",
+    "title": "Example Title"
+}'
+ */
+app.post('/user/favorite/add', async (req, res) => {
+    console.log('Hello req.body ', req.body); 
+    const { rentid, type, status, title } = req.body; // Extract rent_id, type, and status from the body
+    const open_id = req.headers['x-wx-openid'] as string ??''
+
+    
+    if (!open_id || !rentid) {
+        return res.status(400).json({ status: false, error: 'Missing required parameters' });
+    }
+
+    try {
+        const result = await insertFavorite(open_id, rentid, type, status, title );
+        if (result) {
+            res.json({ status: true, message: 'Favorite added successfully', data: result });
+        } else {
+            res.status(409).json({ status: false, error: 'Favorite already exists' });
+        }
+    } catch (error) {
+        console.error('Error adding favorite:', error);
+        res.status(500).json({ status: false, error: 'Internal server error' });
+    }
+});
 
 
 const PORT = process.env.PORT || 6010;
