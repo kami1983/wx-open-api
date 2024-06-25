@@ -238,6 +238,8 @@ export async function fetchRentInfosByOpenIdPaged(open_id: string, page = 1, lim
                 'additional_details',
                 'cover_image',
                 'tags',
+                'type',
+                'status', 
                 'created_at',
                 'updated_at'
             )
