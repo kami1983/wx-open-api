@@ -248,10 +248,10 @@ app.get('/user/favorites/list', async (req, res) => {
     console.log('open_id', open_id, parseInt(page as string), parseInt(limit as string));
     try {
         const favorites = await fetchFavoritesByOpenId(open_id, parseInt(page as string), parseInt(limit as string));
-        res.json({ status: true, data: favorites });
+        res.json({ status: true, backData: favorites });
     } catch (error) {
         console.error('Error fetching favorites:', error);
-        res.status(500).json({ status: false, error: 'Internal server error' });
+        res.status(500).json({ status: false, backData: 'Internal server error' });
     }
 });
 
@@ -266,13 +266,13 @@ app.get('/user/favorite/del', async (req, res) => {
     try {
         const success = await deleteFavorite(open_id, parseInt(rentid as string));
         if (success) {
-            res.json({ status: true, message: 'Favorite deleted successfully' });
+            res.json({ status: true, backData: 'Favorite deleted successfully' });
         } else {
-            res.status(404).json({ status: false, message: 'Favorite not found or already deleted' });
+            res.status(404).json({ status: false, backData: 'Favorite not found or already deleted' });
         }
     } catch (error) {
         console.error('Error deleting favorite:', error);
-        res.status(500).json({ status: false, error: 'Internal server error' });
+        res.status(500).json({ status: false, backData: 'Internal server error' });
     }
 });
 
@@ -300,13 +300,13 @@ app.post('/user/favorite/add', async (req, res) => {
     try {
         const result = await insertFavorite(open_id, rentid, type, status, title );
         if (result) {
-            res.json({ status: true, message: 'Favorite added successfully', data: result });
+            res.json({ status: true, backData: result });
         } else {
-            res.status(409).json({ status: false, error: 'Favorite already exists' });
+            res.status(409).json({ status: false, backData: 'Favorite already exists' });
         }
     } catch (error) {
         console.error('Error adding favorite:', error);
-        res.status(500).json({ status: false, error: 'Internal server error' });
+        res.status(500).json({ status: false, backData: 'Internal server error' });
     }
 });
 
