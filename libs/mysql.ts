@@ -166,6 +166,7 @@ export async function fetchRentInfos(page = 1, limit = 10, type = 1, status = 1)
                 'additional_details',
                 'cover_image',
                 'tags',
+                'tip',
                 'created_at',
                 'updated_at'
             ).where({ type, status })
@@ -197,6 +198,7 @@ export async function fetchRentDetail(rentid: number) {
                 'additional_details',
                 'cover_image',
                 'tags',
+                'tip',
                 'created_at',
                 'updated_at'
             ).where({ id: rentid });
@@ -238,6 +240,7 @@ export async function fetchRentInfosByOpenIdPaged(open_id: string, page = 1, lim
                 'additional_details',
                 'cover_image',
                 'tags',
+                'tip',
                 'type',
                 'status', 
                 'created_at',

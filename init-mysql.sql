@@ -45,6 +45,7 @@ CREATE TABLE `rent_infos` (
   `additional_details` text,
   `tags` varchar(255) DEFAULT NULL,
   `type` int(2) DEFAULT '0',
+  `tip` varchar(255) DEFAULT '',
   `status` int(2) DEFAULT '0',
   `cover_image` varchar(255) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -57,7 +58,8 @@ CREATE TABLE `rent_infos` (
   KEY `idx_open_id` (`open_id`),
   KEY `idx_type` (`type`),
   KEY `idx_status` (`status`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=69 DEFAULT CHARSET=utf8;
+
 
 -- CREATE TABLE `favorites` (
 --   `id` int(11) NOT NULL AUTO_INCREMENT,
