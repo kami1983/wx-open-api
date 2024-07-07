@@ -146,11 +146,12 @@ export async function insertRentInfos(params: TypeInsertRentInfos): Promise<obje
  * @param {number} limit - 每页显示的记录数
  * @returns {Promise<object>} 包含当前页数据和总记录数的对象
  */
-export async function fetchRentInfos(page = 1, limit = 10, type = 1, status = 1) {
-
+export async function fetchRecentRentInfos(page = 1, limit = 10, type = 1, status = 1, keep_day = 7) {
     const offset = (page - 1) * limit; // 计算分页的起始点
 
     try {
+        const sevenDaysAgo = new Date(Date.now() - keep_day * 24 * 60 * 60 * 1000); // 获取7天前的日期
+
         const results = await knex('rent_infos')
             .select(
                 'id',
@@ -169,14 +170,16 @@ export async function fetchRentInfos(page = 1, limit = 10, type = 1, status = 1)
                 'tip',
                 'created_at',
                 'updated_at'
-            ).where({ type, status })
+            )
+            .where({ type, status })
+            .andWhere('updated_at', '>=', sevenDaysAgo) // 只选择在过去7天内创建的记录
             .orderBy('updated_at', 'desc')
             .offset(offset)
             .limit(limit);
 
         return results;
     } catch (error) {
-        console.error('分页查询租赁信息失败:', error);
+        console.error('分页查询最近7天内的租赁信息失败:', error);
         return [];
     }
 }
