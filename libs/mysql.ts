@@ -146,7 +146,7 @@ export async function insertRentInfos(params: TypeInsertRentInfos): Promise<obje
  * @param {number} limit - 每页显示的记录数
  * @returns {Promise<object>} 包含当前页数据和总记录数的对象
  */
-export async function fetchRecentRentInfos(page = 1, limit = 10, type = 1, status = 1, keep_day = 7) {
+export async function fetchRentInfos(page = 1, limit = 10, type = 1, status = 1, keep_day = 7) {
     const offset = (page - 1) * limit; // 计算分页的起始点
 
     try {
