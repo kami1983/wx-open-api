@@ -82,7 +82,7 @@ app.post('/insertRentInfos', async (req, res) => {
 });
 
 app.get('/user/rent-infos', async (req, res) => {
-    const { page = '1', limit = '10', type = '1'} = req.query; // 从请求中获取分页参数
+    const { page = '1', limit = '10', type = '0'} = req.query; // 从请求中获取分页参数
     const open_id = req.headers['x-wx-openid'] as string ??''
     // const open_id = 'o4IK35VLNtV7Cd_t0fiZKP67tOPU'
     const result = await fetchRentInfosByOpenIdPaged(
