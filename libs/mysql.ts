@@ -228,8 +228,11 @@ export async function fetchRentInfosByOpenIdPaged(open_id: string, page = 1, lim
     const offset = (page - 1) * limit; // 计算分页的起始点
 
     try {
-        
-        const select = await knex('rent_infos')
+
+        let results = null;
+
+        if(type === 0) {
+            results = await knex('rent_infos')
             .select(
                 'id',
                 'month_rent_price',
@@ -249,18 +252,38 @@ export async function fetchRentInfosByOpenIdPaged(open_id: string, page = 1, lim
                 'status', 
                 'created_at',
                 'updated_at'
-            );
-
-
-            if(type !== 0){
-                select.where({ open_id, type });
-            }else{
-                select.where({ open_id });
-            }
-
-        const results = select.orderBy('updated_at', 'desc')
+            )
+            .where({ open_id })
+            .orderBy('updated_at', 'desc')
             .offset(offset)
             .limit(limit);
+        } else {
+            results = await knex('rent_infos')
+            .select(
+                'id',
+                'month_rent_price',
+                'rent_type',
+                'rent_area',
+                'rent_address',
+                'room_structure',
+                'location_longitude',
+                'location_latitude',
+                'contact_information',
+                'cash_discount',
+                'additional_details',
+                'cover_image',
+                'tags',
+                'tip',
+                'type',
+                'status', 
+                'created_at',
+                'updated_at'
+            )
+            .where({ open_id, type })
+            .orderBy('updated_at', 'desc')
+            .offset(offset)
+            .limit(limit);
+        }
         return results;
     } catch (error) {
         console.error('分页查询租赁信息失败:', error);
