@@ -81,7 +81,7 @@ app.post('/insertRentInfos', async (req, res) => {
 
 });
 
-// 获取 user infos
+// 
 app.get('/user/infos', async (req, res) => {
     const open_id = req.headers['x-wx-openid'] as string ??''
     // const open_id = 'o4IK35VLNtV7Cd_t0fiZKP67tOPU'
