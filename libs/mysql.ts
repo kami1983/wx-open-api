@@ -109,6 +109,13 @@ export type TypeInsertRentInfos = {
     image_urls: string[]
 }
 
+export type TypeUserInfo = {
+    id: number,
+    open_id: string,
+    avatarUrl: string,
+    nickName: string
+}
+
 export async function insertRentInfos(params: TypeInsertRentInfos): Promise<object|null> {
     try {
         const {
@@ -240,6 +247,48 @@ export async function fetchRentDetail(rentid: number) {
         return null;
     }
 }
+
+export async function getUserInfoByOpenId(open_id: string): Promise<TypeUserInfo|null> {
+    try {
+        const results = await knex('user_info')
+            .select(
+                'id',
+                'open_id',
+                'avatarUrl',
+                'nickName')
+            .where({ open_id });
+
+        if (results.length > 0) {
+            return results[0];
+        }
+        return null;
+    }
+    catch (error) {
+        console.error('查询用户信息失败:', error);
+        return null;
+    }
+}
+
+export async function fetchRentInfosByNickName(nickName: string): Promise<TypeUserInfo|null> {
+    try {
+        const results = await knex('user_info')
+            .select(
+                'id',
+                'open_id',
+                'avatarUrl',
+                'nickName')
+            .where({ nickName });
+
+        if (results.length > 0) {
+            return results[0];
+        }
+        return null;
+    } catch (error) {
+        console.error('根据联系人查询租赁信息失败:', error);
+        return null;
+    }
+}
+
 
 /**
  * 根据 open_id 获取所有相关的租赁信息，并支持分页
