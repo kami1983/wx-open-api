@@ -49,6 +49,7 @@ const knex = require('knex')({
 });
 
 // 用 knex 插入 user_info 表数据，当 open_id 重复时，更新数据
+// 插入成功或者更新成功后，返回插入或更新的数据库ID和OpenID
 export async function insertUserInfo(data: {
     open_id: string, // VARCHAR(255) UNIQUE,
     avatarUrl: string, //  VARCHAR(255),
@@ -60,7 +61,9 @@ export async function insertUserInfo(data: {
 }): Promise<object|null> {
 
     try {
-        return await knex('user_info').insert(data).onConflict('open_id').merge();
+        await knex('user_info').insert(data).onConflict('open_id').merge();
+        const [record] = await knex('user_info').select('id', 'open_id').where({ open_id: data.open_id });
+        return record;
     } catch (error) {
         console.error('插入数据失败:', error);
     } 
