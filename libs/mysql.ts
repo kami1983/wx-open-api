@@ -48,8 +48,8 @@ const knex = require('knex')({
     }
 });
 
-// 用 knex 插入 user_info 表数据，当 open_id 重复时，更新数据
-// 插入成功或者更新成功后，返回插入或更新的数据库ID和OpenID
+// The following code is used to create the user_info table in the database.
+// is not to update records if the open_id already exists in the table.
 export async function insertUserInfo(data: {
     open_id: string, // VARCHAR(255) UNIQUE,
     avatarUrl: string, //  VARCHAR(255),
@@ -59,13 +59,34 @@ export async function insertUserInfo(data: {
     language: string, // VARCHAR(255),
     nickName: string, // VARCHAR(255),
 }): Promise<object|null> {
-
     try {
-        await knex('user_info').insert(data).onConflict('open_id').merge();
-        const [record] = await knex('user_info').select('id', 'open_id').where({ open_id: data.open_id });
-        return record;
+        const [user] = await knex('user_info').select('id', 'open_id', 'avatarUrl', 'nickName').where({ open_id: data.open_id });
+        if (user) {
+            return user;
+        }
+        return await updateUserInfo(data);
     } catch (error) {
         console.error('插入数据失败:', error);
+    } 
+    return null;
+}
+
+// 
+export async function updateUserInfo(data: {
+    open_id: string, // VARCHAR(255) UNIQUE,
+    avatarUrl: string, //  VARCHAR(255),
+    city: string, // VARCHAR(255),
+    country: string, // VARCHAR(255),
+    gender: number, // INT,
+    language: string, // VARCHAR(255),
+    nickName: string, // VARCHAR(255),
+}): Promise<object|null> { 
+    try {
+        await knex('user_info').insert(data).onConflict('open_id').merge();
+        const [record] = await knex('user_info').select('id', 'open_id', 'avatarUrl', 'nickName').where({ open_id: data.open_id });
+        return record;
+    } catch (error) {
+        console.error('更新数据失败:', error);
     } 
     return null;
 }
