@@ -1,7 +1,7 @@
 import express from 'express';
 import axios from 'axios';
 import dotenv from 'dotenv';
-import { insertUserInfo, insertRentInfos, TypeInsertRentInfos, deleteRentInfosByOpenId, fetchRentInfosByOpenIdPaged, refreshRentInfosByOpenId, getRentImagesByRentid, fetchRentInfos, fetchRentDetail, fetchFavoritesByOpenId, deleteFavorite, insertFavorite } from './libs/mysql';
+import { insertUserInfo, updateUserInfo, insertRentInfos, TypeInsertRentInfos, deleteRentInfosByOpenId, fetchRentInfosByOpenIdPaged, refreshRentInfosByOpenId, getRentImagesByRentid, fetchRentInfos, fetchRentDetail, fetchFavoritesByOpenId, deleteFavorite, insertFavorite } from './libs/mysql';
 import { open } from 'fs';
 dotenv.config();
 
@@ -35,8 +35,29 @@ app.post('/registerUser', async (req, res) => {
     }
 });
 
+app.post('/updateUser', async (req, res) => {
+    const insertData = {
+        ...req.body,
+        open_id: req.headers['x-wx-openid'],
+    }
+    const insertRes = await updateUserInfo({
+        open_id: insertData.open_id, // VARCHAR(255) UNIQUE,
+        avatarUrl: insertData.avatarUrl, //  VARCHAR(255),
+        city: insertData.city, // VARCHAR(255),
+        country: insertData.country, // VARCHAR(255),
+        gender: insertData.gender, // INT,
+        language:  insertData.language, // VARCHAR(255),
+        nickName: insertData.nickName, // VARCHAR(255),
+    });
+    if (insertRes) {
+        res.send({status: true, backData: insertRes});
+    }else {
+        res.send({status: false, backData: insertRes});
+    }
+});
+
 app.post('/insertRentInfos', async (req, res) => {
-    console.log('Raw body', req.body)
+    console.log('insertRentInfos Raw body', req.body)
     const {
         month_rent_price,
         rent_type,
@@ -78,7 +99,6 @@ app.post('/insertRentInfos', async (req, res) => {
     }else {
         res.send({status: false, backData: JSON.stringify(raw_data)});
     }
-
 });
 
 // 
