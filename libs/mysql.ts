@@ -232,6 +232,7 @@ export async function fetchRentDetail(rentid: number) {
                 'id',
                 'month_rent_price',
                 'rent_type',
+                'type',
                 'rent_area',
                 'rent_address',
                 'room_structure',
