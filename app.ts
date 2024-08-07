@@ -40,7 +40,7 @@ app.post('/updateUser', async (req, res) => {
         ...req.body,
         open_id: req.headers['x-wx-openid'],
     }
-    
+
     const userInfo = await getUserInfoByOpenId(insertData.open_id);
     if (userInfo && userInfo.nickName !== insertData.nickName) {
         const nickNameExist = await fetchRentInfosByNickName(insertData.nickName);
@@ -136,7 +136,7 @@ app.get('/user/rent-infos', async (req, res) => {
 });
 
 app.get('/rent-infos', async (req, res) => {
-    const { page = '1', limit = '10', type = '1', status = '1' } = req.query; // 从请求中获取分页参数
+    const { page = '1', limit = '10', type = '0', status = '1' } = req.query; // 从请求中获取分页参数
     const result = await fetchRentInfos(
         parseInt(page as string), 
         parseInt(limit as string),

@@ -179,11 +179,11 @@ export async function insertRentInfos(params: TypeInsertRentInfos): Promise<obje
  */
 export async function fetchRentInfos(page = 1, limit = 10, type = 1, status = 1, keep_day = 7) {
     const offset = (page - 1) * limit; // 计算分页的起始点
-
+    
     try {
         const sevenDaysAgo = new Date(Date.now() - keep_day * 24 * 60 * 60 * 1000); // 获取7天前的日期
 
-        const results = await knex('rent_infos')
+        let query = knex('rent_infos')
             .select(
                 'id',
                 'month_rent_price',
@@ -202,13 +202,21 @@ export async function fetchRentInfos(page = 1, limit = 10, type = 1, status = 1,
                 'created_at',
                 'updated_at'
             )
-            .where({ type, status })
-            .andWhere('updated_at', '>=', sevenDaysAgo) // 只选择在过去7天内创建的记录
+            .where({ status })
+            .andWhere('updated_at', '>=', sevenDaysAgo) // 只选择在过去指定天数内更新的记录
             .orderBy('updated_at', 'desc')
             .offset(offset)
             .limit(limit);
+        
+        // 根据类型进行条件过滤
+        if (type !== 0) {
+            query = query.andWhere({ type });
+        }
+
+        const results = await query;
 
         return results;
+
     } catch (error) {
         console.error('分页查询最近7天内的租赁信息失败:', error);
         return [];
@@ -290,22 +298,91 @@ export async function fetchRentInfosByNickName(nickName: string): Promise<TypeUs
 }
 
 
+// /**
+//  * 根据 open_id 获取所有相关的租赁信息，并支持分页
+//  * @param {string} open_id - 用户的 open_id
+//  * @param {number} page - 请求的页码，基于 1 开始计算
+//  * @param {number} limit - 每页显示的记录数
+//  * @returns {Promise<Array>} 返回分页的租赁信息数组
+//  */
+// export async function fetchRentInfosByOpenIdPaged(open_id: string, page = 1, limit = 10, type = 1) {
+//     const offset = (page - 1) * limit; // 计算分页的起始点
+//     try {
+//         let results = null;
+//         if(type === 0) {
+//             results = await knex('rent_infos')
+//             .select(
+//                 'id',
+//                 'month_rent_price',
+//                 'rent_type',
+//                 'rent_area',
+//                 'rent_address',
+//                 'room_structure',
+//                 'location_longitude',
+//                 'location_latitude',
+//                 'contact_information',
+//                 'cash_discount',
+//                 'additional_details',
+//                 'cover_image',
+//                 'tags',
+//                 'tip',
+//                 'type',
+//                 'status', 
+//                 'created_at',
+//                 'updated_at'
+//             )
+//             .where({ open_id })
+//             .orderBy('updated_at', 'desc')
+//             .offset(offset)
+//             .limit(limit);
+//         } else {
+//             results = await knex('rent_infos')
+//             .select(
+//                 'id',
+//                 'month_rent_price',
+//                 'rent_type',
+//                 'rent_area',
+//                 'rent_address',
+//                 'room_structure',
+//                 'location_longitude',
+//                 'location_latitude',
+//                 'contact_information',
+//                 'cash_discount',
+//                 'additional_details',
+//                 'cover_image',
+//                 'tags',
+//                 'tip',
+//                 'type',
+//                 'status', 
+//                 'created_at',
+//                 'updated_at'
+//             )
+//             .where({ open_id, type })
+//             .orderBy('updated_at', 'desc')
+//             .offset(offset)
+//             .limit(limit);
+//         }
+//         return results;
+//     } catch (error) {
+//         console.error('分页查询租赁信息失败:', error);
+//         return [];
+//     }
+// }
+
 /**
- * 根据 open_id 获取所有相关的租赁信息，并支持分页
- * @param {string} open_id - 用户的 open_id
- * @param {number} page - 请求的页码，基于 1 开始计算
+ * 分页获取租赁信息
+ * @param {string} open_id - 用户的 Open ID
+ * @param {number} page - 当前页码
  * @param {number} limit - 每页显示的记录数
- * @returns {Promise<Array>} 返回分页的租赁信息数组
+ * @param {number} type - 租赁信息类型
+ * @returns {Promise<object>} 包含当前页数据和总记录数的对象
  */
 export async function fetchRentInfosByOpenIdPaged(open_id: string, page = 1, limit = 10, type = 1) {
     const offset = (page - 1) * limit; // 计算分页的起始点
 
     try {
-
-        let results = null;
-
-        if(type === 0) {
-            results = await knex('rent_infos')
+        // 创建基础查询
+        let query = knex('rent_infos')
             .select(
                 'id',
                 'month_rent_price',
@@ -322,47 +399,29 @@ export async function fetchRentInfosByOpenIdPaged(open_id: string, page = 1, lim
                 'tags',
                 'tip',
                 'type',
-                'status', 
+                'status',
                 'created_at',
                 'updated_at'
             )
-            .where({ open_id })
+            .where({ open_id }) // 公共筛选条件
             .orderBy('updated_at', 'desc')
             .offset(offset)
             .limit(limit);
-        } else {
-            results = await knex('rent_infos')
-            .select(
-                'id',
-                'month_rent_price',
-                'rent_type',
-                'rent_area',
-                'rent_address',
-                'room_structure',
-                'location_longitude',
-                'location_latitude',
-                'contact_information',
-                'cash_discount',
-                'additional_details',
-                'cover_image',
-                'tags',
-                'tip',
-                'type',
-                'status', 
-                'created_at',
-                'updated_at'
-            )
-            .where({ open_id, type })
-            .orderBy('updated_at', 'desc')
-            .offset(offset)
-            .limit(limit);
+
+        // 根据类型进行条件过滤
+        if (type !== 0) {
+            query = query.andWhere({ type });
         }
+
+        const results = await query;
         return results;
+
     } catch (error) {
         console.error('分页查询租赁信息失败:', error);
         return [];
     }
 }
+
 
 /**
  * Refreshes the rent info entry by updating the updated_at timestamp to the current time.
