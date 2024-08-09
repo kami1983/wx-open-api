@@ -322,7 +322,7 @@ app.post('/share_counter/insert', async (req, res) => {
     const open_id = req.headers['x-wx-openid'] as string ??''
     const { news_id, share_id, chain_hash, chain_type, type, status } = req.body;
     const created_at = new Date().toISOString();
-    if (!open_id || !news_id || !share_id || !chain_hash || !chain_type || !type || !status) {
+    if (!open_id || !news_id || !share_id || !type || !status) {
         return res.status(400).json({ status: false, error: 'Missing required parameters' });
     }
     try {
