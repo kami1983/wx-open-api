@@ -61,24 +61,6 @@ CREATE TABLE `rent_infos` (
 ) ENGINE=InnoDB AUTO_INCREMENT=69 DEFAULT CHARSET=utf8;
 
 
--- CREATE TABLE `favorites` (
---   `id` int(11) NOT NULL AUTO_INCREMENT,
---   `open_id` varchar(255) NOT NULL,
---   `rent_id` int(11) NOT NULL,
---   `type` int(2) DEFAULT '0',  -- 默认值为0，根据需要定义不同类型
---   `status` int(2) DEFAULT '1',  -- 默认状态为1，可以定义为1=有效，0=已删除
---   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
---   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
---   PRIMARY KEY (`id`),
---   UNIQUE KEY `unique_favorite` (`open_id`, `rent_id`),  -- 确保同一个用户不会重复收藏同一个房源
---   FOREIGN KEY (`open_id`) REFERENCES user_info(`open_id`) ON DELETE CASCADE,
---   FOREIGN KEY (`rent_id`) REFERENCES rent_infos(`id`) ON DELETE CASCADE,
---   KEY `idx_open_id` (`open_id`),
---   KEY `idx_rent_id` (`rent_id`),
---   KEY `idx_type` (`type`),  -- 索引type以优化基于类型的查询
---   KEY `idx_status` (`status`)  -- 索引status以优化基于状态的查询
--- ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 CREATE TABLE `favorites` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `open_id` varchar(255) NOT NULL,
@@ -96,4 +78,23 @@ CREATE TABLE `favorites` (
   KEY `idx_status` (`status`),
   CONSTRAINT `favorites_ibfk_1` FOREIGN KEY (`open_id`) REFERENCES `user_info` (`open_id`) ON DELETE CASCADE,
   CONSTRAINT `favorites_ibfk_2` FOREIGN KEY (`rent_id`) REFERENCES `rent_infos` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE share_counter (
+  id int(11) NOT NULL AUTO_INCREMENT,
+  news_id int(11) NOT NULL,
+  share_id varchar(255) NOT NULL,
+  open_id varchar(255) NOT NULL,
+  chain_hash varchar(255) DEFAULT NULL, -- 链上hash
+  chain_type varchar(255) DEFAULT NULL, -- 链上类型
+  type int(2) DEFAULT '1',
+  status int(2) DEFAULT '1',
+  created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY unique_news_share (news_id, share_id, open_id, type), -- 添加唯一索引
+  KEY idx_news_id (news_id),
+  KEY idx_share_id (share_id),
+  KEY idx_open_id (open_id),
+  KEY idx_type (type),
+  KEY idx_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

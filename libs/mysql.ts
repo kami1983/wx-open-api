@@ -20,8 +20,7 @@
  */
 
 // 获取 knex 数据对象
-
-import exp from 'constants';
+import { TypeInsertRentInfos, TypeUserInfo, TypeShareCounter } from './db_type';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -89,31 +88,6 @@ export async function updateUserInfo(data: {
         console.error('更新数据失败:', error);
     } 
     return null;
-}
-
-export type TypeInsertRentInfos = {
-    open_id: string,
-    month_rent_price: number,
-    rent_type: string,
-    rent_area: number,
-    rent_address: string,
-    room_structure: string,
-    location_longitude: number,
-    location_latitude: number,
-    contact_information: string,
-    cash_discount: number,
-    additional_details: string,
-    type: number,
-    status: number,
-    tags: string,
-    image_urls: string[]
-}
-
-export type TypeUserInfo = {
-    id: number,
-    open_id: string,
-    avatarUrl: string,
-    nickName: string
 }
 
 export async function insertRentInfos(params: TypeInsertRentInfos): Promise<object|null> {
@@ -566,6 +540,18 @@ export async function insertFavorite(open_id: string, rent_id: number, type: num
         return id ? { id, open_id, rent_id, type, status } : null; // Return the inserted data or null if ignored
     } catch (error) {
         console.error('Error inserting favorite:', error);
+        return null;
+    }
+}
+
+// Insert a new share counter record
+// news_id, share_id, open_id, type 是唯一索引
+export async function insertShareCounter(data: TypeShareCounter): Promise<object|null> {
+    try {
+        const [id] = await knex('share_counter').insert(data).onConflict(['news_id', 'share_id', 'open_id', 'type']).ignore();
+        return id ? { id, ...data } : null;
+    } catch (error) {
+        console.error('Error inserting share counter:', error);
         return null;
     }
 }

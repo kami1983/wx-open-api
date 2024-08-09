@@ -1,8 +1,24 @@
 import express from 'express';
 import axios from 'axios';
 import dotenv from 'dotenv';
-import { insertUserInfo, updateUserInfo, getUserInfoByOpenId, fetchRentInfosByNickName, insertRentInfos, TypeInsertRentInfos, deleteRentInfosByOpenId, fetchRentInfosByOpenIdPaged, refreshRentInfosByOpenId, getRentImagesByRentid, fetchRentInfos, fetchRentDetail, fetchFavoritesByOpenId, deleteFavorite, insertFavorite } from './libs/mysql';
+import { insertUserInfo, 
+    updateUserInfo, 
+    getUserInfoByOpenId, 
+    fetchRentInfosByNickName, 
+    insertRentInfos, 
+    deleteRentInfosByOpenId, 
+    fetchRentInfosByOpenIdPaged, 
+    refreshRentInfosByOpenId, 
+    getRentImagesByRentid, 
+    fetchRentInfos, 
+    fetchRentDetail, 
+    fetchFavoritesByOpenId, 
+    deleteFavorite, 
+    insertShareCounter,
+    insertFavorite } from './libs/mysql';
+import { TypeInsertRentInfos } from './libs/db_type';
 import { open } from 'fs';
+
 dotenv.config();
 
 const app = express();
@@ -13,6 +29,7 @@ app.get('/', (req, res) => {
     console.log({headers: req.headers});
     res.send({headers: req.headers});
 });
+
 
 app.post('/registerUser', async (req, res) => {
     const insertData = {
@@ -301,6 +318,31 @@ app.get('/user/favorites/list', async (req, res) => {
     }
 });
 
+app.post('/share_counter/insert', async (req, res) => {
+    const open_id = req.headers['x-wx-openid'] as string ??''
+    const { news_id, share_id, chain_hash, chain_type, type, status } = req.body;
+    const created_at = new Date().toISOString();
+    if (!open_id || !news_id || !share_id || !chain_hash || !chain_type || !type || !status) {
+        return res.status(400).json({ status: false, error: 'Missing required parameters' });
+    }
+    try {
+        const result = await insertShareCounter({
+            news_id,
+            share_id,
+            open_id,
+            chain_hash,
+            chain_type,
+            type,
+            status,
+            created_at
+        });
+        res.json({ status: true, backData: result });
+    } catch (error) {
+        console.error('Error inserting share counter:', error);
+        res.status(500).json({ status: false, backData: 'Internal server error' });
+    }
+});
+
 app.get('/user/favorite/del', async (req, res) => {
     const { rentid } = req.query; // assuming rent_id is sent in the request body
     const open_id = req.headers['x-wx-openid'] as string ??''
@@ -354,6 +396,22 @@ app.post('/user/favorite/add', async (req, res) => {
         console.error('Error adding favorite:', error);
         res.status(500).json({ status: false, backData: 'Internal server error' });
     }
+});
+
+app.get('/testShareCounter', async (req, res) => {
+    const insertRes = await insertShareCounter(
+        {
+            news_id: 1,
+            share_id: 'test_share_id',
+            open_id: 'test_open_id',
+            chain_hash: 'test_chain_hash',
+            chain_type: 'test_chain_type',
+            type: 1,
+            status: 1,
+            created_at: '2022-08-09 12:00:00'
+        }
+    );
+    res.send({insertRes});
 });
 
 
